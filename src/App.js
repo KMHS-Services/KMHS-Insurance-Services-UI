@@ -1,26 +1,22 @@
-import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import React, { useState, useEffect } from "react";
+import "./App.css";
+import SignInSide from "./Pages/signIn";
+import Dashboard from "./Pages/dashboard";
 
-function App() {
+export default function App() {
+  
+  const [token, setToken] = useState(null);
+  let tokenSetter=(token)=>{
+    setToken(token)
+  }
+  console.log('init usestate',token);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      {token === null ? (
+        <SignInSide setToken={tokenSetter} token={token} />
+      ) : (
+        <Dashboard setToken={tokenSetter}/>
+      )}
     </div>
   );
 }
-
-export default App;
