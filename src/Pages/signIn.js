@@ -44,7 +44,7 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function SignInSide({ setToken,token }) {
+export default function SignInSide({ setToken,users,setSignUpToggle }) {
   const classes = useStyles();
   
   const [username,setUsername]=useState(null)
@@ -53,10 +53,14 @@ export default function SignInSide({ setToken,token }) {
   function signIn() {
     console.log(username,password);
 setIsIncorrect(false)
-    if(username==='admin' && password==='admin')
-    setToken("asdfawedfa");
-    else
-    setIsIncorrect(true)
+for(let user of users){
+  let {username,password}=user
+  if(username==='admin' && password==='admin'){
+  setToken("asdfawedfa");
+return;
+}
+}
+setIsIncorrect(true)
   }
 
   return (
@@ -119,7 +123,7 @@ setIsIncorrect(false)
               <Grid item xs>
                 Forgot password?
               </Grid>
-              <Grid item>{"Don't have an account? Sign Up"}</Grid>
+              <Grid item><span onClick={()=>setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
             </Grid>
           </form>
         </div>

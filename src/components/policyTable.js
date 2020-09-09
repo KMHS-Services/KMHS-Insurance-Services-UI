@@ -5,8 +5,9 @@ import tableIcons from "./tableIcons";
 export default function PolicyTable() {
   const [state, setState] = React.useState({
     columns: [
+      { title: "Name", field: "name" },
       { title: "Rules", field: "rules" },
-      { title: "Interest(in %)", field: "interest" },
+      { title: "Interest(in %)", field: "interest", type:'numeric' },
       { title: "Is Active?", field: "isActive",lookup:{0:'Active',1:'Inactive'} },
       {
         title: "Scheme",
@@ -14,7 +15,7 @@ export default function PolicyTable() {
         lookup: { 0: "Life", 1: "Medical",2:"Motor", 3:"Home",4:"Travel"},
       },
     ],
-    data: [{rules:"no rules",interest:12,isActive:0,scheme:1}],
+    data: [{name:"Jeevan",rules:"no rules",interest:12,isActive:0,scheme:1}],
   });
 
   return (
