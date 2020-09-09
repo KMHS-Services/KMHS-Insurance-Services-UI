@@ -5,31 +5,33 @@ import Dashboard from "./Pages/dashboard";
 import SignUp from "./Pages/signUp";
 
 export default function App() {
-  const [users, setUsers] = useState([
-    { username: "admin", password: "admin",name:"name",email:"email@email.com",address:"address",phoneNo:"1234567890", dob:'1/1/2000' },
-  ]);
+  let localUsers = JSON.parse(localStorage.getItem('users'));
+
+  if (!localUsers) {
+    localUsers = [
+      { username: "admin", password: "admin", name: "name", email: "email@email.com", address: "address", phoneNo: "1234567890", dob: '1/1/2000' },
+    ];
+  }
+  const [users, setUsers] = useState(localUsers);
+
   const [signUpToggle, setSignUpToggle] = useState(false);
   const [token, setToken] = useState(null);
-  let tokenSetter = (token) => {
-    setToken(token);
-  };
-  console.log("init usestate", token);
   return (
     <div>
       {token === null ? (
         signUpToggle ? (
-          <SignUp setSignUpToggle={setSignUpToggle}/>
+          <SignUp setSignUpToggle={setSignUpToggle} setUsers={setUsers} users={users} />
         ) : (
-          <SignInSide
-            setToken={tokenSetter}
-            token={token}
-            users={users}
-            setSignUpToggle={setSignUpToggle}
-          />
-        )
+            <SignInSide
+              setToken={setToken}
+              token={token}
+              users={users}
+              setSignUpToggle={setSignUpToggle}
+            />
+          )
       ) : (
-        <Dashboard setToken={tokenSetter} />
-      )}
+          <Dashboard setToken={setToken} token={token} />
+        )}
     </div>
   );
 }

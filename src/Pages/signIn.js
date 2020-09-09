@@ -41,37 +41,37 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
+  },logo:{
+    color: 'white', paddingLeft: '7px',
+    backgroundImage: 'linear-gradient(to right,#ff0000,#0000ff)', fontFamily: 'monospace', position: 'absolute',
+    textShadow: '3px 4px 7px rgba(81,67,21,0.8)', left: '20px', top: '0'
   }
 }));
 
-export default function SignInSide({ setToken,users,setSignUpToggle }) {
+export default function SignInSide({ setToken, users, setSignUpToggle }) {
   const classes = useStyles();
-  
-  const [username,setUsername]=useState(null)
-  const [password,setPassword]=useState(null)
-  const [isIncorrect,setIsIncorrect]=useState(false)
+
+  const [username, setUsername] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [isIncorrect, setIsIncorrect] = useState(false);
   function signIn() {
-    console.log(username,password);
-setIsIncorrect(false)
-for(let user of users){
-  let {username,password}=user
-  if(username==='admin' && password==='admin'){
-  setToken("asdfawedfa");
-return;
-}
-}
-setIsIncorrect(true)
+    setIsIncorrect(false);
+    for (let user of users) {
+      if (user.username === username && user.password === password) {
+        setToken(user.username);
+        return;
+      }
+    }
+    setIsIncorrect(true);
   }
 
   return (
-    <Grid  style={{position:'relative'}} container component="main" className={classes.root}>
+    <Grid style={{ position: 'relative' }} container component="main" className={classes.root}>
       <CssBaseline />
-      <Grid item xs={false} sm={4} md={8} className={classes.image} />
-      <Grid item xs={12} sm={8} md={4} component={Paper} elevation={6} square>
+      <Grid item xs={false} sm={false} md={8} className={classes.image} />
+      <Grid item xs={12} sm={12} md={4} component={Paper} elevation={6} square>
         <div className={classes.paper}>
-        <h1 className={classes.logo} style={{color:'white',paddingLeft:'7px',
-        backgroundImage:'linear-gradient(to right,#ff0000,#0000ff)', fontFamily:'monospace', position:'absolute',
-        textShadow: '3px 4px 7px rgba(81,67,21,0.8)',left:'20px',top:'0'}}><b>KMHS</b> Insurance Services</h1>
+          <h1 className={classes.logo} ><b>KMHS</b> Insurance Services</h1>
           <Avatar className={classes.avatar}>
             <LockOutlinedIcon />
           </Avatar>
@@ -80,8 +80,8 @@ setIsIncorrect(true)
           </Typography>
           <form className={classes.form} noValidate>
             <TextField
-            value={username}
-            onChange={e=>{setIsIncorrect(false);setUsername(e.target.value)}}
+              value={username}
+              onChange={e => { setIsIncorrect(false); setUsername(e.target.value); }}
               variant="outlined"
               margin="normal"
               required
@@ -94,7 +94,7 @@ setIsIncorrect(true)
             />
             <TextField
               value={password}
-              onChange={e=>{setIsIncorrect(false);setPassword(e.target.value)}}
+              onChange={e => { setIsIncorrect(false); setPassword(e.target.value); }}
               variant="outlined"
               margin="normal"
               required
@@ -105,7 +105,7 @@ setIsIncorrect(true)
               id="password"
               autoComplete="current-password"
             />
-            {isIncorrect?<div style={{color:"red"}}>Incorrect username or password!</div>:null}
+            {isIncorrect ? <div style={{ color: "red" }}>Incorrect username or password!</div> : null}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
               label="Remember me"
@@ -123,7 +123,7 @@ setIsIncorrect(true)
               <Grid item xs>
                 Forgot password?
               </Grid>
-              <Grid item><span onClick={()=>setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
+              <Grid item><span onClick={() => setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
             </Grid>
           </form>
         </div>

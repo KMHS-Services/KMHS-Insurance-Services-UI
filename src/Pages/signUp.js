@@ -1,18 +1,14 @@
-import React from "react";
+import React, { useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
 import TextField from "@material-ui/core/TextField";
-import FormControlLabel from "@material-ui/core/FormControlLabel";
-import Checkbox from "@material-ui/core/Checkbox";
 import Grid from "@material-ui/core/Grid";
-import Box from "@material-ui/core/Box";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
-import { Router, Link, Switch, Route } from "react-router-dom";
-import SignInSide from "./signIn";
+import { FormControl, FormHelperText } from '@material-ui/core';
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -26,7 +22,7 @@ const useStyles = makeStyles((theme) => ({
     backgroundColor: theme.palette.secondary.main,
   },
   form: {
-    width: "100%", // Fix IE 11 issue.
+    width: "100%",
     marginTop: theme.spacing(3),
   },
   submit: {
@@ -34,9 +30,48 @@ const useStyles = makeStyles((theme) => ({
   },
 }));
 
-export default function SignUp({ setSignUpToggle }) {
+export default function SignUp({ setSignUpToggle, setUsers, users }) {
   const classes = useStyles();
+  const [name, setName] = useState(null);
+  const [username, setUsername] = useState(null);
+  const [email, setEmail] = useState(null);
+  const [password, setPassword] = useState(null);
+  const [confirmPassword, setConfirmPassword] = useState(null);
+  const [phoneNo, setPhoneNo] = useState(null);
+  function signUp(e) {
+    e.preventDefault();
+    console.log(username, password, confirmPassword);
 
+    if (username.length > 20) {
+      alert('length of username must be between 1 and 20');
+      return;
+    }
+    for(let user of users){
+      if(user.username===username){
+        alert('username already taken')
+        return
+      }
+    }
+    if (name.length > 20) {
+      alert('length of name must be between 1 and 20');
+      return;
+    }
+    if (password.length < 8) {
+      alert('length of password must be atleast 8');
+      return;
+    } if (password !== confirmPassword) {
+      alert('password must match the confirm password field');
+      return;
+    } if (`${phoneNo}`.length!==10) {
+      alert('phone number must be of length 10');
+      return;
+    }
+    console.log([...users, { username, password, name, email, phoneNo }]);
+    setUsers([...users, { username, password, name, email, phoneNo }]);
+    localStorage.setItem('users',JSON.stringify([...users, { username, password, name, email, phoneNo }]))
+    alert('user added successfully!');
+    setSignUpToggle(false);
+  }
   return (
     <Container component="main" maxWidth="xs">
       <CssBaseline />
@@ -47,10 +82,12 @@ export default function SignUp({ setSignUpToggle }) {
         <Typography component="h1" variant="h5">
           Sign up
         </Typography>
-        <form className={classes.form} noValidate>
+        <form className={classes.form} onSubmit={signUp}>
           <Grid container spacing={2}>
             <Grid item xs={12}>
               <TextField
+                value={name}
+                onChange={e => setName(e.target.value)}
                 autoComplete="name"
                 name="Name"
                 variant="outlined"
@@ -63,6 +100,8 @@ export default function SignUp({ setSignUpToggle }) {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={username}
+                onChange={e => setUsername(e.target.value)}
                 variant="outlined"
                 required
                 fullWidth
@@ -74,17 +113,22 @@ export default function SignUp({ setSignUpToggle }) {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={email}
+                onChange={e => setEmail(e.target.value)}
                 variant="outlined"
                 required
                 fullWidth
                 id="email"
                 label="Email Address"
+                type="email"
                 name="email"
                 autoComplete="email"
               />
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={password}
+                onChange={e => setPassword(e.target.value)}
                 variant="outlined"
                 required
                 fullWidth
@@ -97,6 +141,8 @@ export default function SignUp({ setSignUpToggle }) {
             </Grid>
             <Grid item xs={12}>
               <TextField
+                value={confirmPassword}
+                onChange={e => setConfirmPassword(e.target.value)}
                 variant="outlined"
                 required
                 fullWidth
@@ -108,19 +154,21 @@ export default function SignUp({ setSignUpToggle }) {
               />
             </Grid>
             <Grid item xs={12}>
-            <Grid item xs={12}>
-              <TextField
-                variant="outlined"
-                required
-                fullWidth
-                name="phonenumber"
-                label="Phone Number"
-                type="text"
-                id="phonenumber"
-                autoComplete="phonenumber"
-              />
-            </Grid>
-             
+              <Grid item xs={12}>
+                <TextField
+                  value={phoneNo}
+                  onChange={e => setPhoneNo(e.target.value)}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="phonenumber"
+                  label="Phone Number"
+                  type="number"
+                  id="phonenumber"
+                  autoComplete="phonenumber"
+                />
+              </Grid>
+
             </Grid>
           </Grid>
           <Button
