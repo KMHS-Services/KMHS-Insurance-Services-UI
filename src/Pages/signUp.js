@@ -181,8 +181,8 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
             Sign Up
           </Button>
           <Grid container justify="flex-end">
-            <Grid item>
-              <span onClick={() => setSignUpToggle(false)}>
+            <Grid item style={{ cursor: 'pointer' }}>
+              <span onClick={() => setSignUpToggle(false)} >
                 {"Already have an account? Sign in"}
               </span>
             </Grid>

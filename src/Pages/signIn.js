@@ -41,7 +41,7 @@ const useStyles = makeStyles((theme) => ({
   },
   submit: {
     margin: theme.spacing(3, 0, 2),
-  },logo:{
+  }, logo: {
     color: 'white', paddingLeft: '7px',
     backgroundImage: 'linear-gradient(to right,#ff0000,#0000ff)', fontFamily: 'monospace', position: 'absolute',
     textShadow: '3px 4px 7px rgba(81,67,21,0.8)', left: '20px', top: '0'
@@ -58,7 +58,7 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
     setIsIncorrect(false);
     for (let user of users) {
       if (user.username === username && user.password === password) {
-        localStorage.setItem('token',user.username)
+        localStorage.setItem('token', user.username);
         setToken(user.username);
         return;
       }
@@ -122,9 +122,11 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
             </Button>
             <Grid container>
               <Grid item xs>
-                Forgot password?
+                <span hidden>
+                  forgot password?
+              </span>
               </Grid>
-              <Grid item><span onClick={() => setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
+              <Grid item style={{ cursor: 'pointer' }}><span onClick={() => setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
             </Grid>
           </form>
         </div>
