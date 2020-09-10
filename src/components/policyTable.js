@@ -47,7 +47,7 @@ export default function PolicyTable() {
                   alert('interest must be in the range of 0 to 100');
                   return { ...prevState };
                 }
-                if (newData.isActive !== 0 && newData.isActive !== 1) {
+                if (newData.isActive !== 0 &&newData.isActive !== '0' && newData.isActive !== 1&&newData.isActive !== '1') {
                   newData.isActive = 0;
                 }
                 if (!newData.scheme) {
@@ -79,7 +79,8 @@ export default function PolicyTable() {
                   if (!newData.rules || newData.rules.length === 0) {
                     alert('rules field cannot be empty');
                     return { ...prevState };
-                  } if (newData.isActive !== 0 && newData.isActive !== 1) {
+                  }
+                  if (newData.isActive !== 0 &&newData.isActive !== '0' && newData.isActive !== 1&&newData.isActive !== '1') {
                     newData.isActive = 0;
                   }
                   if (!newData.scheme) {
