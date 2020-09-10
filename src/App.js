@@ -15,7 +15,9 @@ export default function App() {
   const [users, setUsers] = useState(localUsers);
 
   const [signUpToggle, setSignUpToggle] = useState(false);
-  const [token, setToken] = useState(null);
+  let localToken=localStorage.getItem('token');
+  if (!localToken)localToken=null;
+  const [token, setToken] = useState(localToken);
   return (
     <div>
       {token === null ? (

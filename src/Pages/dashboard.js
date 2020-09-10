@@ -67,6 +67,7 @@ function DashBoard(props) {
     setMobileOpen(!mobileOpen);
   };
   function signOut() {
+    localStorage.removeItem('token')
     setToken(null);
   }
   const drawer = (

@@ -58,6 +58,7 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
     setIsIncorrect(false);
     for (let user of users) {
       if (user.username === username && user.password === password) {
+        localStorage.setItem('token',user.username)
         setToken(user.username);
         return;
       }
