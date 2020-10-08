@@ -1,124 +1,113 @@
 import React, { useEffect } from "react";
 import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
-import axios from 'axios'
+import axios from 'axios';
+import moment from 'moment'
 
 
-export default function PolicyTable() {
+export default function StaffTable() {
 
-  const [state, setState] = React.useState({
-    columns: [
-      { title: "Name", field: "policy", editable:'onAdd' },
-      { title: "Rules", field: "rules" },
-      { title: "Interest(in %)", field: "interest", type: 'numeric' },
-      { title: "Is Active?", field: "is_active", lookup: { 0: 'Inactive' ,1: 'Active'} },
-      {
-        title: "Scheme",
-        field: "scheme",
-        lookup: { 0: "Life", 1: "Medical", 2: "Motor", 3: "Home", 4: "Travel" },
-      },
-    ],
-    data: [],
-    tableLoading:false
-  })
-  useEffect(()=>{
-    axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err=>console.log);
+	const [state, setState] = React.useState({
+		columns: [
+			{ title: "DOB", field: "DOB"},
+			{ title: "Name", field: "name" },
+			{ title: "Address", field: "address" },
+			{ title: "Phone Number", field: "phone_number", type:'numeric' },
+      { title: "Blood Group", field: "blood_group", lookup: { 'O+': 'O+', 'A+': 'A+', 'B+': 'B+', 'AB+': 'AB+', 'O-': 'O-', 'A-': 'A-', 'B-': 'B-', 'AB-': 'AB-', } },
+			{ title: "Email", field: "email_id" },
+		],
+		data: [],
+		tableLoading: false
+	});
+	useEffect(() => {
+		axios.get('http://localhost:3000/api/staff/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
 
-  },[])
+	}, []);
+	const validateEmail = function (mail) {
+		return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail));
+	};
+	const isValid = function ({ DOB,name,address,phone_number,email_id }) {
+		if (!email_id || email_id === '' || !validateEmail(email_id))
+			return 'Invalid Email ID';
+		if (!name || name === '')
+			return 'Invalid Name';
+		if (!address
+			|| address
+			=== '')
+			return 'Invalid Address';
+		if (!phone_number
+			|| phone_number.length!==10)
+			return 'Invalid Phone Number';
+
+		if (!DOB
+			|| DOB.length!==10|| !moment(DOB, 'DD/MM/YYYY', true).isValid())
+			return 'Invalid Date Of Birth';
+
+		return true;
+	};
 
 
+	return (
+		<MaterialTable
+		Style="overflowX:'auto'"
+			icons={tableIcons}
+			title="Staff"
+			columns={state.columns}
+			data={state.data}
+			editable={{
+				onRowAdd: (newData) =>
+					new Promise((resolve) => {
+						setTimeout(() => {
+							resolve();
+							setState((prevState) => {
+								const data = [...prevState.data];
 
-  return (
-    <MaterialTable
-      icons={tableIcons}
-      title="Policies"
-      columns={state.columns}
-      data={state.data}
-      editable={{
-        onRowAdd: (newData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                if (!newData.policy || newData.policy.length === 0) {
-                  alert('name field cannot be empty');
-                  return { ...prevState };
-                }
-                if (!newData.rules || newData.rules.length === 0) {
-                  alert('rules field cannot be empty');
-                  return { ...prevState };
-                }
-                if (!newData.interest || `${newData.interest}`.length === 0 || newData.interest < 0 || newData.interest > 100) {
-                  alert('interest must be in the range of 0 to 100');
-                  return { ...prevState };
-                }
-                if (newData.is_active !== 0 &&newData.is_active !== '0' && newData.is_active !== 1&&newData.is_active !== '1') {
-                  newData.is_active = 0;
-                }
-                if (!newData.scheme) {
-                  alert('scheme field cannot be empty');
-                  return {...prevState};
-                }
-                newData.id = data.length;
-                axios.post('http://localhost:3000/api/policy/create',newData).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
-                return prevState;
-              });
-            }, 600);
-          }),
-        onRowUpdate: (newData, oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              if (oldData) {
-                // localStorage.setState('policies',prevState.data)
-                setState((prevState) => {
-                  const data = [...prevState.data];
+								let validity=isValid(newData)
+								if(!(validity===true)){
+									alert(validity)
+									return { ...prevState }
+								}
+								newData.id = data.length;
+								axios.post('http://localhost:3000/api/staff/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								return prevState;
+							});
+						}, 600);
+					}),
+				onRowUpdate: (newData, oldData) =>
+					new Promise((resolve) => {
+						setTimeout(() => {
+							resolve();
+							if (oldData) {
+								// localStorage.setState('policies',prevState.data)
+								setState((prevState) => {
+									const data = [...prevState.data];
 
-                  if (!newData.policy || newData.policy.length === 0) {
-                    alert('name field cannot be empty');
-                    return { ...prevState };
-                  }
-                  if (!newData.rules || newData.rules.length === 0) {
-                    alert('rules field cannot be empty');
-                    return { ...prevState };
-                  }
-                  if (newData.is_active !== 0 &&newData.is_active !== '0' && newData.is_active !== 1&&newData.is_active !== '1') {
-                    newData.is_active = 0;
-                  }
-                  if (!newData.scheme) {
-                    alert('scheme field cannot be empty');
-                    return {...prevState};
-                  }
-                  console.log(newData.interest);
-                  if (!newData.interest || `${newData.interest}`.length === 0 || newData.interest < 0 || newData.interest > 100) {
-                    alert('interest must be in the range of 0 to 100');
-                    return { ...prevState };
-                  }
-                  data[data.indexOf(oldData)] = newData;
-                  // localStorage.setItem('policies', JSON.stringify(data));
-                  axios.post('http://localhost:3000/api/policy/update',newData).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
-                  return { ...prevState, data };
-                });
-              }
-            }, 600);
-          }),
-        onRowDelete: (oldData) =>
-          new Promise((resolve) => {
-            setTimeout(() => {
-              resolve();
-              setState((prevState) => {
-                const data = [...prevState.data];
-                data.splice(data.indexOf(oldData), 1);
-                let policy=oldData.policy
-                console.log(policy);
-                // localStorage.setItem('policies', JSON.stringify(data));
-                axios.post('http://localhost:3000/api/policy/delete',{policy}).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
-                return { ...prevState, data };
-              });
-            }, 600);
-          }),
-      }}
-    />
-  );
+									let validity=isValid(newData)
+									if(!(validity===true)){
+										alert(validity)
+										return { ...prevState }
+									}
+									data[data.indexOf(oldData)] = newData;
+									axios.post('http://localhost:3000/api/staff/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									return { ...prevState, data };
+								});
+							}
+						}, 600);
+					}),
+				onRowDelete: (oldData) =>
+					new Promise((resolve) => {
+						setTimeout(() => {
+							resolve();
+							setState((prevState) => {
+								const data = [...prevState.data];
+								data.splice(data.indexOf(oldData), 1);
+								// localStorage.setItem('policies', JSON.stringify(data));
+								axios.post('http://localhost:3000/api/staff/delete', { staff_id:oldData.staff_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								return { ...prevState, data };
+							});
+						}, 600);
+					}),
+			}}
+		/>
+	);
 }

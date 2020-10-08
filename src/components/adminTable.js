@@ -2,6 +2,7 @@ import React, { useEffect } from "react";
 import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
 import axios from 'axios';
+import moment from 'moment'
 
 
 export default function AdminTable() {
@@ -29,26 +30,26 @@ export default function AdminTable() {
 	};
 	const isValid = function ({ admin_email_id, admin_password, admin_name, admin_address, admin_pincode, admin_phone_number, admin_DOB, admin_blood_group }) {
 		if (!admin_email_id || admin_email_id === '' || !validateEmail(admin_email_id))
-			return false;
+			return 'Invalid Email ID';
 		if (!admin_password || admin_password.length < 8)
-			return false;
+			return 'Invalid Password';
 		if (!admin_name || admin_name === '')
-			return false;
+			return 'Invalid Name';
 		if (!admin_address
 			|| admin_address
 			=== '')
-			return false;
+			return 'Invalid Address';
 		if (!admin_pincode
 			|| admin_pincode
-			=== '')
-			return false;
+			=== ''||`${admin_pincode}`.length!==6)
+			return 'Invalid Pincode';
 		if (!admin_phone_number
-			|| admin_phone_number
-			=== '')
-			return false;
+			|| `${admin_phone_number}`.length!==10)
+			return 'Invalid Phone Number';
+
 		if (!admin_DOB
-			|| admin_DOB.length===10||admin_DOB)
-			return false;
+			|| admin_DOB.length!==10|| !moment(admin_DOB, 'DD/MM/YYYY', true).isValid())
+			return 'Invalid Date Of Birth';
 
 		return true;
 	};
@@ -56,6 +57,7 @@ export default function AdminTable() {
 
 	return (
 		<MaterialTable
+		Style="overflowX:'auto'"
 			icons={tableIcons}
 			title="Admins"
 			columns={state.columns}
@@ -67,27 +69,14 @@ export default function AdminTable() {
 							resolve();
 							setState((prevState) => {
 								const data = [...prevState.data];
-								if (!newData.policy || newData.policy.length === 0) {
-									alert('name field cannot be empty');
-									return { ...prevState };
-								}
-								if (!newData.rules || newData.rules.length === 0) {
-									alert('rules field cannot be empty');
-									return { ...prevState };
-								}
-								if (!newData.interest || `${newData.interest}`.length === 0 || newData.interest < 0 || newData.interest > 100) {
-									alert('interest must be in the range of 0 to 100');
-									return { ...prevState };
-								}
-								if (newData.is_active !== 0 && newData.is_active !== '0' && newData.is_active !== 1 && newData.is_active !== '1') {
-									newData.is_active = 0;
-								}
-								if (!newData.scheme) {
-									alert('scheme field cannot be empty');
-									return { ...prevState };
+
+								let validity=isValid(newData)
+								if(!(validity===true)){
+									alert(validity)
+									return { ...prevState }
 								}
 								newData.id = data.length;
-								axios.post('http://localhost:3000/api/admin/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								axios.post('http://localhost:3000/api/admin/register', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 								return prevState;
 							});
 						}, 600);
@@ -101,28 +90,12 @@ export default function AdminTable() {
 								setState((prevState) => {
 									const data = [...prevState.data];
 
-									if (!newData.policy || newData.policy.length === 0) {
-										alert('name field cannot be empty');
-										return { ...prevState };
-									}
-									if (!newData.rules || newData.rules.length === 0) {
-										alert('rules field cannot be empty');
-										return { ...prevState };
-									}
-									if (newData.is_active !== 0 && newData.is_active !== '0' && newData.is_active !== 1 && newData.is_active !== '1') {
-										newData.is_active = 0;
-									}
-									if (!newData.scheme) {
-										alert('scheme field cannot be empty');
-										return { ...prevState };
-									}
-									console.log(newData.interest);
-									if (!newData.interest || `${newData.interest}`.length === 0 || newData.interest < 0 || newData.interest > 100) {
-										alert('interest must be in the range of 0 to 100');
-										return { ...prevState };
+									let validity=isValid(newData)
+									if(!(validity===true)){
+										alert(validity)
+										return { ...prevState }
 									}
 									data[data.indexOf(oldData)] = newData;
-									// localStorage.setItem('policies', JSON.stringify(data));
 									axios.post('http://localhost:3000/api/admin/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 									return { ...prevState, data };
 								});
@@ -136,10 +109,7 @@ export default function AdminTable() {
 							setState((prevState) => {
 								const data = [...prevState.data];
 								data.splice(data.indexOf(oldData), 1);
-								let policy = oldData.policy;
-								console.log(policy);
-								// localStorage.setItem('policies', JSON.stringify(data));
-								axios.post('http://localhost:3000/api/policy/delete', { policy }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								axios.post('http://localhost:3000/api/admin/delete', { admin_email_id:oldData.admin_email_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 								return { ...prevState, data };
 							});
 						}, 600);
