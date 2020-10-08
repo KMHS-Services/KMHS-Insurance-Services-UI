@@ -6,18 +6,21 @@ import Divider from '@material-ui/core/Divider';
 import Drawer from '@material-ui/core/Drawer';
 import Hidden from '@material-ui/core/Hidden';
 import IconButton from '@material-ui/core/IconButton';
-import InboxIcon from '@material-ui/icons/MoveToInbox';
+// import InboxIcon from '@material-ui/icons/MoveToInbox';
 import List from '@material-ui/core/List';
 import ListItem from '@material-ui/core/ListItem';
 import ListItemIcon from '@material-ui/core/ListItemIcon';
 import ListItemText from '@material-ui/core/ListItemText';
-import MailIcon from '@material-ui/icons/Mail';
+// import MailIcon from '@material-ui/icons/Mail';
 import MenuIcon from '@material-ui/icons/Menu';
 import Toolbar from '@material-ui/core/Toolbar';
 import Typography from '@material-ui/core/Typography';
 import { makeStyles, useTheme } from '@material-ui/core/styles';
 import Button from '@material-ui/core/Button';
 import PolicyTable from '../components/policyTable';
+import AdminTable from '../components/adminTable';
+import UserTable from '../components/userTable';
+import StaffTable from '../components/staffTable';
 import PolicyIcon from '@material-ui/icons/Policy';
 
 
@@ -62,6 +65,7 @@ function DashBoard(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
+  const [path,setPath]=React.useState(localStorage.getItem('path')||'Policy')
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -70,14 +74,40 @@ function DashBoard(props) {
     localStorage.removeItem('token')
     setToken(null);
   }
+  function chooseComponent(path){
+    switch (path) {
+      case 'Policy':
+        return <PolicyTable />
+      case 'Admin':
+        return <AdminTable />
+      case 'User':
+       return <UserTable />
+      case 'Staff':
+        return <StaffTable />
+      default:
+        break;
+    }
+  }
   const drawer = (
     <div>
       <div className={classes.toolbar} />
       <Divider />
       <List>
-        <ListItem selected button key={'Policy'}>
+        <ListItem selected={path==='Policy'} button key={'Policy'} onClick={()=>{setPath('Policy');localStorage.setItem('path','Policy')}}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'Maintain Policy'} />
+        </ListItem>
+        <ListItem selected={path==='Admin'} button key={'Admin'} onClick={()=>{setPath('Admin');localStorage.setItem('path','Admin')}}>
+          <ListItemIcon><PolicyIcon /></ListItemIcon>
+          <ListItemText primary={'Maintain Admins'} />
+        </ListItem>
+        <ListItem selected={path==='Staff'} button key={'Staff'} onClick={()=>{setPath('Staff');localStorage.setItem('path','Staff')}}>
+          <ListItemIcon><PolicyIcon /></ListItemIcon>
+          <ListItemText primary={'Maintain Staff'} />
+        </ListItem>
+        <ListItem selected={path==='User'} button key={'User'} onClick={()=>{setPath('User');localStorage.setItem('path','User')}}>
+          <ListItemIcon><PolicyIcon /></ListItemIcon>
+          <ListItemText primary={'Maintain User'} />
         </ListItem>
       </List>
       <Divider />
@@ -143,7 +173,10 @@ function DashBoard(props) {
       </nav>
       <main className={classes.content}>
         <div className={classes.toolbar} />
-        <PolicyTable />
+        {
+          chooseComponent(path)
+        }
+
       </main>
     </div>
   );
