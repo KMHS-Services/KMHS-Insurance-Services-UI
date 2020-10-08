@@ -36,7 +36,7 @@ export default function StaffTable() {
 			=== '')
 			return 'Invalid Address';
 		if (!phone_number
-			|| phone_number.length!==10)
+			|| `${phone_number}`.length!==10)
 			return 'Invalid Phone Number';
 
 		if (!DOB
