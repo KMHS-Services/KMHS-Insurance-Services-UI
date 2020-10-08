@@ -1,15 +1,17 @@
 import React from "react";
 import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
+import axios from 'axios'
+
 
 export default function PolicyTable() {
-  
+
   const [state, setState] = React.useState({
     columns: [
-      { title: "Name", field: "name" },
+      { title: "Name", field: "policy" },
       { title: "Rules", field: "rules" },
       { title: "Interest(in %)", field: "interest", type: 'numeric' },
-      { title: "Is Active?", field: "isActive", lookup: { 1: 'Active', 0: 'Inactive' } },
+      { title: "Is Active?", field: "is_active", lookup: { 1: 'Active', 0: 'Inactive' } },
       {
         title: "Scheme",
         field: "scheme",
@@ -17,7 +19,10 @@ export default function PolicyTable() {
       },
     ],
     data: [],
+    tableLoading:false
   });
+  axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err=>console.log)
+
 
   return (
     <MaterialTable
@@ -52,10 +57,8 @@ export default function PolicyTable() {
                   return {...prevState};
                 }
                 newData.id = data.length;
-
-                data.push(newData);
-
-                localStorage.setItem('policies', JSON.stringify(data));
+                let newState=prevState;
+                axios.post('http://localhost:3000/api/create',newData).then(res=>newState={...prevState,data}).catch(err=>{})
                 return { ...prevState, data };
               });
             }, 600);
