@@ -3,10 +3,7 @@ import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
 
 export default function PolicyTable() {
-  let localData = JSON.parse(localStorage.getItem('policies'));
-  if (!localData) {
-    localData = [{ id: 1, name: "Jeevan", rules: "no rules", interest: 12, isActive: 0, scheme: 1 }];
-  }
+  
   const [state, setState] = React.useState({
     columns: [
       { title: "Name", field: "name" },
@@ -19,7 +16,7 @@ export default function PolicyTable() {
         lookup: { 0: "Life", 1: "Medical", 2: "Motor", 3: "Home", 4: "Travel" },
       },
     ],
-    data: localData,
+    data: [],
   });
 
   return (
