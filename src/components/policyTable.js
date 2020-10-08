@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
 import axios from 'axios'
@@ -20,8 +20,11 @@ export default function PolicyTable() {
     ],
     data: [],
     tableLoading:false
-  });
-  axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err=>console.log)
+  })
+  useEffect(()=>{
+    axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err=>console.log);
+  })
+  
 
 
   return (
@@ -37,7 +40,7 @@ export default function PolicyTable() {
               resolve();
               setState((prevState) => {
                 const data = [...prevState.data];
-                if (!newData.name || newData.name.length === 0) {
+                if (!newData.policy || newData.policy.length === 0) {
                   alert('name field cannot be empty');
                   return { ...prevState };
                 }
@@ -72,7 +75,7 @@ export default function PolicyTable() {
                 setState((prevState) => {
                   const data = [...prevState.data];
 
-                  if (!newData.name || newData.name.length === 0) {
+                  if (!newData.policy || newData.policy.length === 0) {
                     alert('name field cannot be empty');
                     return { ...prevState };
                   }
