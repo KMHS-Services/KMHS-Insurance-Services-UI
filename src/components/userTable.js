@@ -3,6 +3,9 @@ import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
 import axios from 'axios';
 import moment from 'moment'
+import jsPDF from "jspdf/dist/jspdf.min.js";
+import autoTable from "jspdf-autotable/dist/jspdf.plugin.autotable.min";
+import { Button } from "@material-ui/core";
 
 
 export default function UserTable() {
@@ -64,9 +67,54 @@ export default function UserTable() {
 		return true;
 	};
 
+	function pdfGenerator() {
+		console.log("pdf generator");
+		var doc = new jsPDF("p", "pt", "a4");
+		let temp = "Users";
+		var textWidth =
+			(doc.getStringUnitWidth(temp) * doc.internal.getFontSize()) /
+			doc.internal.scaleFactor;
+		var textOffset = (doc.internal.pageSize.width - textWidth) / 2;
+		var header = function (data) {
+			doc.setFontSize(18);
+			doc.setTextColor(40);
+			doc.setFontStyle("bold");
+			doc.text(textOffset, 40, temp);
+		};
+		var options = {
+			beforePageContent: header,
+			margin: {
+				top: 80,
+			},
+			headStyles: {
+				valign: "middle",
+				halign: "center",
+			},
+			startY: doc.autoTableEndPosY() + 70,
+		};
+		doc.setTextColor(40);
+		var columns = state.columns.map((q) => {
+			if(q.title !== "Password" && q.title !== "Address" )
+			return {
+				label: q.title,
+				title: q.title,
+				field: q.field,
+				dataKey: q.field
+			}
+		}
+		)
+		doc.autoTable(columns, state.data, options);
+		console.log(doc)
+		var name = 'User-'+ new Date().toLocaleString();
+		doc.save(name);
+	}
 
 	return (
-		<MaterialTable
+		<div>
+			<Button onClick={pdfGenerator}>
+				Generate PDF
+			</Button>
+			<MaterialTable
 		Style="overflowX:'auto'"
 			icons={tableIcons}
 			title="Users"
@@ -126,5 +174,7 @@ export default function UserTable() {
 					}),
 			}}
 		/>
+		</div>
+		
 	);
 }

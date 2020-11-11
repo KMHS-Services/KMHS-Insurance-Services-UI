@@ -2,56 +2,48 @@ import React, { useEffect } from "react";
 import MaterialTable from "material-table";
 import tableIcons from "./tableIcons";
 import axios from 'axios';
-import moment from 'moment'
+import moment from 'moment';
 import jsPDF from "jspdf/dist/jspdf.min.js";
 import autoTable from "jspdf-autotable/dist/jspdf.plugin.autotable.min";
 import { Button } from "@material-ui/core";
 
 
-export default function AdminTable() {
+export default function StaffTable() {
 
 	const [state, setState] = React.useState({
 		columns: [
-			{ title: "Email", field: "admin_email_id", editable: 'onAdd' },
-			{ title: "Password", field: "admin_password" },
-			{ title: "Name", field: "admin_name" },
-			{ title: "Address", field: "admin_address" },
-			{ title: "Pincode", field: "admin_pincode", type: 'numeric' },
-			{ title: "PhNo", field: "admin_phone_number", type: 'numeric' },
-			{ title: "DOB", field: "admin_DOB" },
-			{ title: "Blood Group", field: "admin_blood_group", lookup: { 'O+': 'O+', 'A+': 'A+', 'B+': 'B+', 'AB+': 'AB+', 'O-': 'O-', 'A-': 'A-', 'B-': 'B-', 'AB-': 'AB-', } },
+			{ title: "DOB", field: "DOB" },
+			{ title: "Name", field: "name" },
+			{ title: "Address", field: "address" },
+			{ title: "Phone Number", field: "phone_number", type: 'numeric' },
+			{ title: "Blood Group", field: "blood_group", lookup: { 'O+': 'O+', 'A+': 'A+', 'B+': 'B+', 'AB+': 'AB+', 'O-': 'O-', 'A-': 'A-', 'B-': 'B-', 'AB-': 'AB-', } },
+			{ title: "Email", field: "email_id" },
 		],
 		data: [],
 		tableLoading: false
 	});
 	useEffect(() => {
-		axios.get('http://localhost:3000/api/admin/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
+		axios.get('http://localhost:3000/api/policytaken/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
 
 	}, []);
 	const validateEmail = function (mail) {
 		return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail));
 	};
-	const isValid = function ({ admin_email_id, admin_password, admin_name, admin_address, admin_pincode, admin_phone_number, admin_DOB, admin_blood_group }) {
-		if (!admin_email_id || admin_email_id === '' || !validateEmail(admin_email_id))
+	const isValid = function ({ DOB, name, address, phone_number, email_id }) {
+		if (!email_id || email_id === '' || !validateEmail(email_id))
 			return 'Invalid Email ID';
-		if (!admin_password || admin_password.length < 8)
-			return 'Invalid Password';
-		if (!admin_name || admin_name === '')
+		if (!name || name === '')
 			return 'Invalid Name';
-		if (!admin_address
-			|| admin_address
+		if (!address
+			|| address
 			=== '')
 			return 'Invalid Address';
-		if (!admin_pincode
-			|| admin_pincode
-			=== '' || `${admin_pincode}`.length !== 6)
-			return 'Invalid Pincode';
-		if (!admin_phone_number
-			|| `${admin_phone_number}`.length !== 10)
+		if (!phone_number
+			|| `${phone_number}`.length !== 10)
 			return 'Invalid Phone Number';
 
-		if (!admin_DOB
-			|| admin_DOB.length !== 10 || !moment(admin_DOB, 'DD/MM/YYYY', true).isValid())
+		if (!DOB
+			|| DOB.length !== 10 || !moment(DOB, 'DD/MM/YYYY', true).isValid())
 			return 'Invalid Date Of Birth';
 
 		return true;
@@ -59,7 +51,7 @@ export default function AdminTable() {
 	function pdfGenerator() {
 		console.log("pdf generator");
 		var doc = new jsPDF("p", "pt", "a4");
-		let temp = "Admins";
+		let temp = "Policies Taken";
 		var textWidth =
 			(doc.getStringUnitWidth(temp) * doc.internal.getFontSize()) /
 			doc.internal.scaleFactor;
@@ -83,7 +75,6 @@ export default function AdminTable() {
 		};
 		doc.setTextColor(40);
 		var columns = state.columns.map((q) => {
-			if(q.title !== "Password")
 			return {
 				label: q.title,
 				title: q.title,
@@ -94,7 +85,7 @@ export default function AdminTable() {
 		)
 		doc.autoTable(columns, state.data, options);
 		console.log(doc)
-		var name = 'Admin-' + new Date().toLocaleString();
+		var name = 'Policy-Taken-'+ new Date().toLocaleString();
 		doc.save(name);
 	}
 
@@ -107,7 +98,7 @@ export default function AdminTable() {
 			<MaterialTable
 				Style="overflowX:'auto'"
 				icons={tableIcons}
-				title="Admins"
+				title="Policies Taken"
 				columns={state.columns}
 				data={state.data}
 				editable={{
@@ -118,13 +109,13 @@ export default function AdminTable() {
 								setState((prevState) => {
 									const data = [...prevState.data];
 
-									let validity = isValid(newData)
+									let validity = isValid(newData);
 									if (!(validity === true)) {
-										alert(validity)
-										return { ...prevState }
+										alert(validity);
+										return { ...prevState };
 									}
 									newData.id = data.length;
-									axios.post('http://localhost:3000/api/admin/register', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/policytaken/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 									return prevState;
 								});
 							}, 600);
@@ -138,13 +129,13 @@ export default function AdminTable() {
 									setState((prevState) => {
 										const data = [...prevState.data];
 
-										let validity = isValid(newData)
+										let validity = isValid(newData);
 										if (!(validity === true)) {
-											alert(validity)
-											return { ...prevState }
+											alert(validity);
+											return { ...prevState };
 										}
 										data[data.indexOf(oldData)] = newData;
-										axios.post('http://localhost:3000/api/admin/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+										axios.post('http://localhost:3000/api/policytaken/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 										return { ...prevState, data };
 									});
 								}
@@ -157,7 +148,8 @@ export default function AdminTable() {
 								setState((prevState) => {
 									const data = [...prevState.data];
 									data.splice(data.indexOf(oldData), 1);
-									axios.post('http://localhost:3000/api/admin/delete', { admin_email_id: oldData.admin_email_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									// localStorage.setItem('policies', JSON.stringify(data));
+									axios.post('http://localhost:3000/api/policytaken/delete', { staff_id: oldData.staff_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 									return { ...prevState, data };
 								});
 							}, 600);
