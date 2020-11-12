@@ -9,6 +9,7 @@ import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import Container from "@material-ui/core/Container";
 import { FormControl, FormHelperText } from '@material-ui/core';
+import axios from '../assets/AxiosInstance'
 
 const useStyles = makeStyles((theme) => ({
   paper: {
@@ -34,10 +35,16 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
   const classes = useStyles();
   const [name, setName] = useState(null);
   const [username, setUsername] = useState(null);
-  const [email, setEmail] = useState(null);
+  const [emailid, setEmail] = useState(null);
   const [password, setPassword] = useState(null);
   const [confirmPassword, setConfirmPassword] = useState(null);
-  const [phoneNo, setPhoneNo] = useState(null);
+  const [phonenumber, setPhoneNo] = useState(null);
+  const [DOB, setDOB] = useState(null);
+  const [address, setAddress] = useState(null);
+  const [pincode, setPincode] = useState(null);
+  const [loan_amount, setLoanAmount] = useState(0);
+  const [premium_amount, setPremiumAmount] = useState(0);
+
   function signUp(e) {
     e.preventDefault();
     console.log(username, password, confirmPassword);
@@ -46,8 +53,8 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
       alert('length of username must be between 1 and 20');
       return;
     }
-    for(let user of users){
-      if(user.username===username){
+    for (let user of users) {
+      if (user.username === username) {
         alert('username already taken')
         return
       }
@@ -62,15 +69,31 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
     } if (password !== confirmPassword) {
       alert('password must match the confirm password field');
       return;
-    } if (`${phoneNo}`.length!==10) {
+    } if (`${phonenumber}`.length !== 10) {
       alert('phone number must be of length 10');
       return;
     }
-    console.log([...users, { username, password, name, email, phoneNo }]);
-    setUsers([...users, { username, password, name, email, phoneNo }]);
-    localStorage.setItem('users',JSON.stringify([...users, { username, password, name, email, phoneNo }]))
-    alert('user added successfully!');
-    setSignUpToggle(false);
+    if (`${pincode}`.length !== 6) {
+      alert('pincode must be of length 6');
+      return;
+    }
+    console.log("request")
+    axios.post('/api/auth/signup', { username, password, name, phonenumber, emailid, DOB, address, pincode,loan_amount,premium_amount })
+      .then((res) => {
+        if(res.data.message === 'Successfully Signed Up!'){
+          alert('user added successfully!');
+        }
+      }).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+        }
+      })
+      //.finally(() => setLoading(false))
+    // console.log([...users, { username, password, name, email, phoneNo }]);
+    // setUsers([...users, { username, password, name, email, phoneNo }]);
+    // localStorage.setItem('users',JSON.stringify([...users, { username, password, name, email, phoneNo }]))
+    // 
+    // setSignUpToggle(false);
   }
   return (
     <Container component="main" maxWidth="xs">
@@ -110,10 +133,43 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
                 name="username"
                 autoComplete="lname"
               />
+              
+            </Grid>
+            <Grid item >
+            <TextField
+              id="date"
+              label="Date of Birth"
+              type="date"
+              value={DOB}
+              onChange = {(e)=>setDOB(e.target.value)}
+              defaultValue="2020-01-01"
+              className={classes.textField}
+              InputLabelProps={{
+                shrink: true,
+              }}
+            />
+
             </Grid>
             <Grid item xs={12}>
               <TextField
-                value={email}
+                value={address}
+                onChange={e => setAddress(e.target.value)}
+                variant="outlined"
+                required
+                fullWidth
+                id="email"
+                label="Permanent House Address"
+                type="text"
+                name="address"
+                autoComplete="address"
+                multiline
+              />
+            </Grid>
+            
+            
+            <Grid item xs={12}>
+              <TextField
+                value={emailid}
                 onChange={e => setEmail(e.target.value)}
                 variant="outlined"
                 required
@@ -156,7 +212,7 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
             <Grid item xs={12}>
               <Grid item xs={12}>
                 <TextField
-                  value={phoneNo}
+                  value={phonenumber}
                   onChange={e => setPhoneNo(e.target.value)}
                   variant="outlined"
                   required
@@ -170,6 +226,22 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
               </Grid>
 
             </Grid>
+            <Grid item xs={12}>
+                <TextField
+                  value={pincode}
+                  onChange={e => setPincode(e.target.value)}
+                  variant="outlined"
+                  required
+                  fullWidth
+                  name="pincode"
+                  label="Pincode"
+                  type="number"
+                  id="pincode"
+                  autoComplete="pincode"
+                />
+              </Grid>
+              
+            
           </Grid>
           <Button
             type="submit"
@@ -177,6 +249,7 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
             variant="contained"
             color="primary"
             className={classes.submit}
+            onClick = {signUp}
           >
             Sign Up
           </Button>

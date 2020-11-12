@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import Avatar from "@material-ui/core/Avatar";
 import Button from "@material-ui/core/Button";
 import CssBaseline from "@material-ui/core/CssBaseline";
@@ -11,6 +11,7 @@ import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
 import axios from '../assets/AxiosInstance'
+import { InputLabel, MenuItem, Select } from "@material-ui/core";
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -49,48 +50,53 @@ const useStyles = makeStyles((theme) => ({
   }
 }));
 
-export default function SignInSide({ setToken, users, setSignUpToggle }) {
+export default function PickPolicy({ setToken, users, setSignUpToggle }) {
   const classes = useStyles();
+  const [policy, setPolicy] = React.useState('');
+  const [data,setData] = React.useState();
 
-  const [username, setUsername] = useState(null);
-  const [password, setPassword] = useState(null);
-  const [isAdmin, setIsAdmin] = useState(false);
-  const [loading, setLoading] = useState(false);
+  useEffect(()=>{
+    axios.get('/api/policy/pickpolicy')
+    .then((res)=>{
+      localStorage.setItem('token', res.data);
+      setData(res.data);
+  })
+  },[])
+
+  const handleChangePolicy = (event) => {
+    setPolicy(event.target.value);
+  };
+  const [admin, setAdmin] = React.useState('');
+
+  const handleChangeAdmin = (event) => {
+    setPolicy(event.target.value);
+  };
+  const [username, setUsername] = React.useState(localStorage.getItem('username'));
+  
   const [isIncorrect, setIsIncorrect] = useState(false);
   function signIn() {
     setIsIncorrect(false);
-    setLoading(true)
-    axios.post('/api/auth/login',{username,password,isAdmin})
+    axios.get('/api/policy/pickpolicy')
     .then((res)=>{
-        localStorage.setItem('token', res.data.token);
-        localStorage.setItem('isAdmin', isAdmin);
-        localStorage.setItem('username', username);
+        localStorage.setItem('token', res.data);
         setToken(res.data.token);
     }).catch(err=>{
       if(err.response&&err.response.status===401){
         setIsIncorrect(true)
       }
-    }).finally(()=>setLoading(false))
+    })
     setIsIncorrect(true);
   }
 
   return (
-    <Grid style={{ position: 'relative' }} container component="main" className={classes.root}>
-      <CssBaseline />
-      <Grid item xs={false} sm={false} md={8} className={classes.image} />
-      <Grid item xs={12} sm={12} md={4} component={Paper} elevation={6} square>
+    
         <div className={classes.paper}>
-          <h1 className={classes.logo} ><b>KMHS</b> Insurance Services</h1>
-          <Avatar className={classes.avatar}>
-            <LockOutlinedIcon />
-          </Avatar>
           <Typography component="h1" variant="h5">
-            Sign in
+            Pick Policy
           </Typography>
           <form className={classes.form} noValidate>
             <TextField
               value={username}
-              onChange={e => { setIsIncorrect(false); setUsername(e.target.value); }}
               variant="outlined"
               margin="normal"
               required
@@ -100,54 +106,63 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
               name="username"
               autoComplete="username"
               autoFocus
+              disabled
             />
-            <TextField
-              value={password}
-              onChange={e => { setIsIncorrect(false); setPassword(e.target.value); }}
-              variant="outlined"
-              margin="normal"
-              required
-              fullWidth
-              name="password"
-              label="Password"
-              type="password"
-              id="password"
-              autoComplete="current-password"
-            />
-            <FormControlLabel
-              control={ <Checkbox
-              checked={isAdmin}
-              onChange={()=>setIsAdmin(!isAdmin)}
-              inputProps={{ 'aria-label': 'primary checkbox' }}
-            />}
-              label="Are you Admin"
-            /><br/>
-            {isIncorrect ? <div style={{ color: "red" }}>Incorrect username or password!</div> : null}
-            <FormControlLabel
-              control={<Checkbox value="remember" color="primary" />}
-              label="Remember me"
-            />
+            <br/>
+        <br/>
+        
+        <Select
+          displayEmpty
+          value={policy}
+          onChange={handleChangePolicy}
+          renderValue={(selected) => {
+            if (selected.length === 0) {
+              return <em>Pick Policy</em>;
+            }
+            return selected.join(', ');
+          }}
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem disabled value="">
+            <em>Select a Policy</em>
+          </MenuItem>
+          {data.policies.map((q)=>{
+            return <MenuItem value={q}>{q}</MenuItem>
+          })}
+        </Select>
+        <br/>
+        <br/>
+
+        <Select
+          displayEmpty
+          value={admin}
+          onChange={handleChangeAdmin}
+          renderValue={(selected) => {
+            if (selected.length === 0) {
+              return <em>Select Admin</em>;
+            }
+            return selected.join(', ');
+          }}
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem disabled value="">
+            <em>Select Admin</em>
+          </MenuItem>
+          <MenuItem value={10}>Ten</MenuItem>
+          <MenuItem value={20}>Twenty</MenuItem>
+          <MenuItem value={30}>Thirty</MenuItem>
+        </Select>
+            
             <Button
               onClick={signIn}
               fullWidth
               variant="contained"
               color="primary"
               className={classes.submit}
-              disabled={loading}
             >
-              Sign In
+              Proceed
             </Button>
-            <Grid container>
-              <Grid item xs>
-                <span hidden>
-                  forgot password?
-              </span>
-              </Grid>
-              <Grid item style={{ cursor: 'pointer' }}><span onClick={() => setSignUpToggle(true)}>{"Don't have an account? Sign Up"}</span></Grid>
-            </Grid>
           </form>
         </div>
-      </Grid>
-    </Grid>
   );
 }

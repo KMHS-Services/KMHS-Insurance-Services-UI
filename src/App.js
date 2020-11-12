@@ -2,7 +2,7 @@ import React, { useState } from "react";
 import "./App.css";
 import SignInSide from "./Pages/signIn";
 import Dashboard from "./Pages/dashboard";
-import SignUp from "./Pages/signUp";
+import SignUp from "./Pages/userSignUp";
 
 export default function App() {
   let localUsers = JSON.parse(localStorage.getItem('users'));

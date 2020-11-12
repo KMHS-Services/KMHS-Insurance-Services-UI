@@ -23,6 +23,7 @@ import UserTable from '../components/userTable';
 import StaffTable from '../components/staffTable';
 import PolicyIcon from '@material-ui/icons/Policy';
 import Stats from '../components/stats'
+import PickPolicy from '../components/pickPolicy'
 
 
 const drawerWidth = 240;
@@ -62,11 +63,11 @@ const useStyles = makeStyles((theme) => ({
 }));
 
 function DashBoard(props) {
-  const { window, setToken,token } = props;
+  const { window, setToken, token } = props;
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [path,setPath]=React.useState(localStorage.getItem('path')||'Policy')
+  const [path, setPath] = React.useState(localStorage.getItem('path') || 'Policy')
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -75,20 +76,20 @@ function DashBoard(props) {
     localStorage.removeItem('token')
     setToken(null);
   }
-  function chooseComponent(path){
+  function chooseComponent(path) {
     switch (path) {
       case 'Policy':
         return <PolicyTable />
       case 'Admin':
         return <AdminTable />
       case 'User':
-       return <UserTable />
+        return <UserTable />
       case 'Staff':
         return <StaffTable />
       case 'Stats':
         return <Stats />
       case 'PickPolicy':
-        return <Stats />
+        return <PickPolicy />
       case 'MyPolicies':
         return <Stats />
       default:
@@ -99,28 +100,36 @@ function DashBoard(props) {
     <div>
       <div className={classes.toolbar} />
       <Divider />
-      <List>
-        <ListItem selected={path==='Policy'} button key={'Policy'} onClick={()=>{setPath('Policy');localStorage.setItem('path','Policy')}}>
-          <ListItemIcon><PolicyIcon /></ListItemIcon>
-          <ListItemText primary={'Maintain Policy'} />
-        </ListItem>
-        <ListItem selected={path==='Admin'} button key={'Admin'} onClick={()=>{setPath('Admin');localStorage.setItem('path','Admin')}}>
+
+      {localStorage.getItem('isAdmin') === "true"? <List><ListItem selected={path === 'Policy'} button key={'Policy'} onClick={() => { setPath('Policy'); localStorage.setItem('path', 'Policy') }}>
+        <ListItemIcon><PolicyIcon /></ListItemIcon>
+        <ListItemText primary={'Maintain Policy'} />
+      </ListItem><ListItem selected={path === 'Admin'} button key={'Admin'} onClick={() => { setPath('Admin'); localStorage.setItem('path', 'Admin') }}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'Maintain Admins'} />
         </ListItem>
-        <ListItem selected={path==='Staff'} button key={'Staff'} onClick={()=>{setPath('Staff');localStorage.setItem('path','Staff')}}>
+        <ListItem selected={path === 'Staff'} button key={'Staff'} onClick={() => { setPath('Staff'); localStorage.setItem('path', 'Staff') }}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'Maintain Staff'} />
         </ListItem>
-        <ListItem selected={path==='User'} button key={'User'} onClick={()=>{setPath('User');localStorage.setItem('path','User')}}>
+        <ListItem selected={path === 'User'} button key={'User'} onClick={() => { setPath('User'); localStorage.setItem('path', 'User') }}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'Maintain User'} />
         </ListItem>
-        <ListItem selected={path==='Stats'} button key={'Stats'} onClick={()=>{setPath('Stats');localStorage.setItem('path','Stats')}}>
+        <ListItem selected={path === 'Stats'} button key={'Stats'} onClick={() => { setPath('Stats'); localStorage.setItem('path', 'Stats') }}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'View Stats'} />
         </ListItem>
-      </List>
+      </List> : <List><ListItem selected={path === 'PickPolicy'} button key={'PickPolicy'} onClick={() => { setPath('PickPolicy'); localStorage.setItem('path', 'PickPolicy') }}>
+        <ListItemIcon><PolicyIcon /></ListItemIcon>
+        <ListItemText primary={'Pick Policy'} />
+      </ListItem>
+      <ListItem selected={path === 'MyPolicies'} button key={'MyPolicies'} onClick={() => { setPath('MyPolicies'); localStorage.setItem('path', 'MyPolicies') }}>
+        <ListItemIcon><PolicyIcon /></ListItemIcon>
+        <ListItemText primary={'My Policies'} />
+      </ListItem></List>
+      }
+
       <Divider />
     </div>
   );
@@ -145,7 +154,7 @@ function DashBoard(props) {
             <b>KMHS</b> Insurance Services
           </Typography>
           <b>
-          {`Hello, ${token}   `}
+            {`Hello, ${token}   `}
           </b>
           <Button onClick={signOut} color="inherit">Logout</Button>
 
