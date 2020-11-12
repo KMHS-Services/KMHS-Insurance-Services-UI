@@ -22,6 +22,7 @@ import AdminTable from '../components/adminTable';
 import UserTable from '../components/userTable';
 import StaffTable from '../components/staffTable';
 import PolicyIcon from '@material-ui/icons/Policy';
+import Stats from '../components/stats'
 
 
 const drawerWidth = 240;
@@ -84,6 +85,12 @@ function DashBoard(props) {
        return <UserTable />
       case 'Staff':
         return <StaffTable />
+      case 'Stats':
+        return <Stats />
+      case 'PickPolicy':
+        return <Stats />
+      case 'MyPolicies':
+        return <Stats />
       default:
         break;
     }
@@ -108,6 +115,10 @@ function DashBoard(props) {
         <ListItem selected={path==='User'} button key={'User'} onClick={()=>{setPath('User');localStorage.setItem('path','User')}}>
           <ListItemIcon><PolicyIcon /></ListItemIcon>
           <ListItemText primary={'Maintain User'} />
+        </ListItem>
+        <ListItem selected={path==='Stats'} button key={'Stats'} onClick={()=>{setPath('Stats');localStorage.setItem('path','Stats')}}>
+          <ListItemIcon><PolicyIcon /></ListItemIcon>
+          <ListItemText primary={'View Stats'} />
         </ListItem>
       </List>
       <Divider />

@@ -10,6 +10,7 @@ import Grid from "@material-ui/core/Grid";
 import LockOutlinedIcon from "@material-ui/icons/LockOutlined";
 import Typography from "@material-ui/core/Typography";
 import { makeStyles } from "@material-ui/core/styles";
+import axios from '../assets/AxiosInstance'
 
 const useStyles = makeStyles((theme) => ({
   root: {
@@ -53,16 +54,21 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
 
   const [username, setUsername] = useState(null);
   const [password, setPassword] = useState(null);
+  const [isAdmin, setIsAdmin] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [isIncorrect, setIsIncorrect] = useState(false);
   function signIn() {
     setIsIncorrect(false);
-    for (let user of users) {
-      if (user.username === username && user.password === password) {
-        localStorage.setItem('token', user.username);
-        setToken(user.username);
-        return;
+    setLoading(true)
+    axios.post('/api/auth/login',{username,password,isAdmin})
+    .then((res)=>{
+        localStorage.setItem('token', res.data.token);
+        setToken(res.data.token);
+    }).catch(err=>{
+      if(err.response&&err.response.status===401){
+        setIsIncorrect(true)
       }
-    }
+    }).finally(()=>setLoading(false))
     setIsIncorrect(true);
   }
 
@@ -106,6 +112,14 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
               id="password"
               autoComplete="current-password"
             />
+            <FormControlLabel
+              control={ <Checkbox
+              checked={isAdmin}
+              onChange={()=>setIsAdmin(!isAdmin)}
+              inputProps={{ 'aria-label': 'primary checkbox' }}
+            />}
+              label="Are you Admin"
+            /><br/>
             {isIncorrect ? <div style={{ color: "red" }}>Incorrect username or password!</div> : null}
             <FormControlLabel
               control={<Checkbox value="remember" color="primary" />}
@@ -117,6 +131,7 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
               variant="contained"
               color="primary"
               className={classes.submit}
+              disabled={loading}
             >
               Sign In
             </Button>
