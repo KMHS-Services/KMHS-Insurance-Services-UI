@@ -53,39 +53,35 @@ const useStyles = makeStyles((theme) => ({
 export default function PickPolicy({ setToken, users, setSignUpToggle }) {
   const classes = useStyles();
   const [policy, setPolicy] = React.useState('');
-  const [data,setData] = React.useState();
+  const [data,setData] = React.useState({policies:[],admins:[],users:[]});
 
   useEffect(()=>{
     axios.get('/api/policy/pickpolicy')
     .then((res)=>{
-      localStorage.setItem('token', res.data);
       setData(res.data);
+      console.log(res.data);
   })
   },[])
 
   const handleChangePolicy = (event) => {
     setPolicy(event.target.value);
   };
-  const [admin, setAdmin] = React.useState('');
+  const [admin_email_id, setAdmin] = React.useState('');
 
   const handleChangeAdmin = (event) => {
-    setPolicy(event.target.value);
+    setAdmin(event.target.value);
   };
   const [username, setUsername] = React.useState(localStorage.getItem('username'));
   
-  const [isIncorrect, setIsIncorrect] = useState(false);
-  function signIn() {
-    setIsIncorrect(false);
-    axios.get('/api/policy/pickpolicy')
+  function pickPolicy() {
+    axios.post('/api/policyTaken/create',{username,policy,admin_email_id})
     .then((res)=>{
-        localStorage.setItem('token', res.data);
-        setToken(res.data.token);
+        alert(res.data.message)
     }).catch(err=>{
-      if(err.response&&err.response.status===401){
-        setIsIncorrect(true)
+      if(err.response){
+        alert(err.message)
       }
     })
-    setIsIncorrect(true);
   }
 
   return (
@@ -114,12 +110,13 @@ export default function PickPolicy({ setToken, users, setSignUpToggle }) {
         <Select
           displayEmpty
           value={policy}
+          style={{width:"80%"}}
           onChange={handleChangePolicy}
           renderValue={(selected) => {
             if (selected.length === 0) {
               return <em>Pick Policy</em>;
             }
-            return selected.join(', ');
+            return selected;
           }}
           inputProps={{ 'aria-label': 'Without label' }}
         >
@@ -135,26 +132,27 @@ export default function PickPolicy({ setToken, users, setSignUpToggle }) {
 
         <Select
           displayEmpty
-          value={admin}
+          value={admin_email_id}
+          style={{width:"80%"}}
           onChange={handleChangeAdmin}
           renderValue={(selected) => {
             if (selected.length === 0) {
               return <em>Select Admin</em>;
             }
-            return selected.join(', ');
+            return selected;
           }}
           inputProps={{ 'aria-label': 'Without label' }}
         >
           <MenuItem disabled value="">
             <em>Select Admin</em>
           </MenuItem>
-          <MenuItem value={10}>Ten</MenuItem>
-          <MenuItem value={20}>Twenty</MenuItem>
-          <MenuItem value={30}>Thirty</MenuItem>
+          {data.admins.map((q)=>{
+            return <MenuItem value={q}>{q}</MenuItem>
+          })}
         </Select>
             
             <Button
-              onClick={signIn}
+              onClick={pickPolicy}
               fullWidth
               variant="contained"
               color="primary"

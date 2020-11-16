@@ -1,36 +1,22 @@
-import React, { useState, useEffect } from "react";
-import axios from '../assets/AxiosInstance'
-import CanvasJSReact from '../assets/canvasjs.react';
-var CanvasJSChart = CanvasJSReact.CanvasJSChart;
-var CanvasJS = CanvasJSReact.CanvasJS;
+import { Card } from '@material-ui/core';
+import React, { useState } from 'react';
+import PolicyStats from './policyStats';
+import AgeStats from './ageStats';
+const Stats = () => {
 
-export default function SignInSide() {
-
-	const [state, setState] = React.useState({
-		data: [],
-		loading: false
-	})
-	const options = {
-		title: {
-			text: ""
-		},
-		data: [
-			{
-				// Change type to "doughnut", "line", "splineArea", etc.
-				type: "column",
-				dataPoints: state.data,
-			}
-		]
-	}
-  useEffect(() => {
-				axios.get('http://localhost:3000/api/stats/policy').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
-			}, [])
-  return(
-	  <div>
-		<CanvasJSChart options={options}
-		/* onRef={ref => this.chart = ref} */
-		/>
-	{ JSON.stringify(state.data) }
-	  </div >
-  );
+	const [component,setComponent] = useState(null)
+	return ( 
+		<div>
+			{component===null? <React.Fragment>
+			<Card onClick={()=>setComponent("policy stats")}>
+				View Policy Stats
+			</Card>
+			<Card onClick={()=>setComponent("age stats")}>
+				View Age Stats
+			</Card>
+			</React.Fragment>:(component==="policy stats"?<PolicyStats/>:<AgeStats />)}
+		</div>
+	 );
 }
+ 
+export default Stats;

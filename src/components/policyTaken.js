@@ -12,18 +12,38 @@ export default function StaffTable() {
 
 	const [state, setState] = React.useState({
 		columns: [
-			{ title: "DOB", field: "DOB" },
-			{ title: "Name", field: "name" },
-			{ title: "Address", field: "address" },
-			{ title: "Phone Number", field: "phone_number", type: 'numeric' },
-			{ title: "Blood Group", field: "blood_group", lookup: { 'O+': 'O+', 'A+': 'A+', 'B+': 'B+', 'AB+': 'AB+', 'O-': 'O-', 'A-': 'A-', 'B-': 'B-', 'AB-': 'AB-', } },
-			{ title: "Email", field: "email_id" },
+			{ title: "Username", field: "username", editable: 'never' },
+			{ title: "Policy", field: "policy", editable: 'never' },
+			{ title: "Admin Email ID", field: "admin_email_id", lookup: {} },
 		],
 		data: [],
 		tableLoading: false
 	});
 	useEffect(() => {
-		axios.get('http://localhost:3000/api/policytaken/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
+		axios.get('http://localhost:3000/api/policytaken/readall')
+			.then(res => {
+				var data = [...res.data.data]; axios.get('http://localhost:3000/api/policy/pickpolicy').then(res => {
+					var lookup = {}
+					res.data.admins.map((q) => {
+						lookup[q] = q
+					});
+					setState({
+						...state, columns: [
+							{ title: "Username", field: "username", editable: 'onAdd' },
+							{ title: "Policy", field: "policy", editable: 'onAdd' },
+							{ title: "Admin Email ID", field: "admin_email_id", lookup: { ...lookup } },
+						], data: [...data]
+					})
+				})
+			})
+
+
+		// 	setState({
+		// 		...state, columns: [{ title: "Username", field: "username", editable: 'never' },
+		// 		{ title: "Policy", field: "policy", editable: 'never' },
+		// 		{ title: "Admin Email ID", field: "admin_email_id", lookup: { ...lookup } }]
+		// 	})
+		// }).catch(err => console.log);
 
 	}, []);
 	const validateEmail = function (mail) {
@@ -48,53 +68,11 @@ export default function StaffTable() {
 
 		return true;
 	};
-	function pdfGenerator() {
-		console.log("pdf generator");
-		var doc = new jsPDF("p", "pt", "a4");
-		let temp = "Policies Taken";
-		var textWidth =
-			(doc.getStringUnitWidth(temp) * doc.internal.getFontSize()) /
-			doc.internal.scaleFactor;
-		var textOffset = (doc.internal.pageSize.width - textWidth) / 2;
-		var header = function (data) {
-			doc.setFontSize(18);
-			doc.setTextColor(40);
-			doc.setFontStyle("bold");
-			doc.text(textOffset, 40, temp);
-		};
-		var options = {
-			beforePageContent: header,
-			margin: {
-				top: 80,
-			},
-			headStyles: {
-				valign: "middle",
-				halign: "center",
-			},
-			startY: doc.autoTableEndPosY() + 70,
-		};
-		doc.setTextColor(40);
-		var columns = state.columns.map((q) => {
-			return {
-				label: q.title,
-				title: q.title,
-				field: q.field,
-				dataKey: q.field
-			}
-		}
-		)
-		doc.autoTable(columns, state.data, options);
-		console.log(doc)
-		var name = 'Policy-Taken-'+ new Date().toLocaleString();
-		doc.save(name);
-	}
+
 
 
 	return (
 		<div>
-			<Button onClick={pdfGenerator}>
-				Generate PDF
-			</Button>
 			<MaterialTable
 				Style="overflowX:'auto'"
 				icons={tableIcons}
