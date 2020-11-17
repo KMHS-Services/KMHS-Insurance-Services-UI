@@ -32,9 +32,11 @@ export default function AdminTable() {
 		return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail));
 	};
 	const isValid = function ({ admin_email_id, admin_password, admin_name, admin_address, admin_pincode, admin_phone_number, admin_DOB, admin_blood_group }) {
+		if (admin_password ==='~')
+			return 'You cannot change the details of this admin without password!'
 		if (!admin_email_id || admin_email_id === '' || !validateEmail(admin_email_id))
 			return 'Invalid Email ID';
-		if (!admin_password || admin_password.length < 8)
+		if ( !admin_password || admin_password.length < 8)
 			return 'Invalid Password';
 		if (!admin_name || admin_name === '')
 			return 'Invalid Name';

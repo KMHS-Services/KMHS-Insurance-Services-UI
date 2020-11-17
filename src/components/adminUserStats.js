@@ -14,7 +14,7 @@ const AdminUserStats =()=> {
 			animationEnabled: true,
 			theme: "light2",
 			title:{
-				text: "Number of Policies under Management"
+				text: "Number of Users under Management"
 			},
 			axisX: {
 				title: "Admin",

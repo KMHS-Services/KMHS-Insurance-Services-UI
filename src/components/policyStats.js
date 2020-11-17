@@ -12,7 +12,7 @@ export default function PolicyStats() {
 	})
 	const options = {
 		title: {
-			text: ""
+			text: "Policy Statistics"
 		},
 		data: [
 			{

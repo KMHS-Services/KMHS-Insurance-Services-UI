@@ -8,25 +8,77 @@ import autoTable from "jspdf-autotable/dist/jspdf.plugin.autotable.min";
 import { Button } from "@material-ui/core";
 
 
-export default function StaffTable() {
+export default function TransactionHistoryTable() {
 
 	const [state, setState] = React.useState({
 		columns: [
-			{ title: "Username", field: "username", editable: 'never' },
-			{ title: "Transaction Amount", field: "policy"},
-			{ title: "Transaction Time", field: "admin_email_id", editable: 'never' },
+			{ title: "Username", field: "username", editable: 'onAdd', lookup: {} },
+			{ title: "Transaction Time", field: "transaction_time", editable: 'never' },
+			{ title: "Transaction Amount", field: "transaction_amount", editable: 'onAdd' },
 		],
 		data: [],
 		tableLoading: false
 	});
+	function pdfGenerator() {
+		console.log("pdf generator");
+		var doc = new jsPDF("p", "pt", "a4");
+		let temp = "Transaction History";
+		var textWidth =
+			(doc.getStringUnitWidth(temp) * doc.internal.getFontSize()) /
+			doc.internal.scaleFactor;
+		var textOffset = (doc.internal.pageSize.width - textWidth) / 2;
+		var header = function (data) {
+			doc.setFontSize(18);
+			doc.setTextColor(40);
+			doc.setFontStyle("bold");
+			doc.text(textOffset, 40, temp);
+		};
+		var options = {
+			beforePageContent: header,
+			margin: {
+				top: 80,
+			},
+			headStyles: {
+				valign: "middle",
+				halign: "center",
+			},
+			startY: doc.autoTableEndPosY() + 70,
+		};
+		doc.setTextColor(40);
+		var columns = state.columns.map((q) => {
+			return {
+				label: q.title,
+				title: q.title,
+				field: q.field,
+				dataKey: q.field
+			}
+		}
+		)
+		doc.autoTable(columns, state.data, options);
+		console.log(doc)
+		var name = 'TransactionHistory-'+ new Date().toLocaleString();
+		doc.save(name);
+	}
 	useEffect(() => {
-		axios.get('http://localhost:3000/api/policytaken/readall')
+		axios.get('http://localhost:3000/api/transaction/readall')
 			.then(res => {
-				var data = [...res.data.data];
+				var data = [...res.data.data]; axios.get('http://localhost:3000/api/policy/pickpolicy').then(res => {
+					var users_lookup = {}
+
+					res.data.users.map((q) => {
+						users_lookup[q] = q
+					});
 					setState({
-						...state, data: [...data]
+						...state, columns: [
+							{ title: "Username", field: "username", editable: 'onAdd', lookup: { ...users_lookup } },
+							{ title: "Transaction Time", field: "transaction_localetime", editable: 'never' },
+							{ title: "Transaction Amount", field: "transaction_amount", editable: 'onAdd' },
+						], data: [...data]
 					})
 				})
+			})
+
+
 		// 	setState({
 		// 		...state, columns: [{ title: "Username", field: "username", editable: 'never' },
 		// 		{ title: "Policy", field: "policy", editable: 'never' },
@@ -35,37 +87,20 @@ export default function StaffTable() {
 		// }).catch(err => console.log);
 
 	}, []);
-	const validateEmail = function (mail) {
-		return (/^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/.test(mail));
-	};
-	const isValid = function ({ DOB, name, address, phone_number, email_id }) {
-		if (!email_id || email_id === '' || !validateEmail(email_id))
-			return 'Invalid Email ID';
-		if (!name || name === '')
-			return 'Invalid Name';
-		if (!address
-			|| address
-			=== '')
-			return 'Invalid Address';
-		if (!phone_number
-			|| `${phone_number}`.length !== 10)
-			return 'Invalid Phone Number';
 
-		if (!DOB
-			|| DOB.length !== 10 || !moment(DOB, 'DD/MM/YYYY', true).isValid())
-			return 'Invalid Date Of Birth';
 
-		return true;
-	};
 
 
 
 	return (
 		<div>
+			<Button onClick={pdfGenerator}>
+				Generate PDF
+			</Button>
 			<MaterialTable
 				Style="overflowX:'auto'"
 				icons={tableIcons}
-				title="Policies Taken"
+				title="Transaction History"
 				columns={state.columns}
 				data={state.data}
 				editable={{
@@ -75,10 +110,11 @@ export default function StaffTable() {
 								resolve();
 								setState((prevState) => {
 									const data = [...prevState.data];
-
-									
+									if(newData.transaction_amount < 0)
+										{alert("Transaction Amount cannot be negative!");
+										 return prevState}
 									newData.id = data.length;
-									axios.post('http://localhost:3000/api/policytaken/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/transaction/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 									return prevState;
 								});
 							}, 600);
@@ -91,8 +127,9 @@ export default function StaffTable() {
 									// localStorage.setState('policies',prevState.data)
 									setState((prevState) => {
 										const data = [...prevState.data];
+										
 										data[data.indexOf(oldData)] = newData;
-										axios.post('http://localhost:3000/api/policytaken/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+										axios.post('http://localhost:3000/api/transaction/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 										return { ...prevState, data };
 									});
 								}
@@ -106,7 +143,7 @@ export default function StaffTable() {
 									const data = [...prevState.data];
 									data.splice(data.indexOf(oldData), 1);
 									// localStorage.setItem('policies', JSON.stringify(data));
-									axios.post('http://localhost:3000/api/policytaken/delete', { staff_id: oldData.staff_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/transaction/delete', oldData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
 									return { ...prevState, data };
 								});
 							}, 600);

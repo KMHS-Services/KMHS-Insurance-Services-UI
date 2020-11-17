@@ -11,9 +11,9 @@ export default function RevenueStats() {
 		loading: false
 	})
 	const options = {
-		title: {
-			text: ""
-    },
+		title:{
+			text: "Revenue Statistics"
+		},
     axisX: {
       title: "Time in Milliseconds",
       reversed: true,
