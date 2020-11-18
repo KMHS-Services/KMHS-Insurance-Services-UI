@@ -71,7 +71,6 @@ export default function SignInSide({ setToken, users, setSignUpToggle }) {
         setIsIncorrect(true)
       }
     }).finally(()=>setLoading(false))
-    setIsIncorrect(true);
   }
 
   return (
