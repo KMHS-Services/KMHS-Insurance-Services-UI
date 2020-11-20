@@ -51,22 +51,22 @@ export default function TransactionHistoryTable() {
 				title: q.title,
 				field: q.field,
 				dataKey: q.field
-			}
+			};
 		}
-		)
+		);
 		doc.autoTable(columns, state.data, options);
-		console.log(doc)
-		var name = 'TransactionHistory-'+ new Date().toLocaleString();
+		console.log(doc);
+		var name = 'TransactionHistory-' + new Date().toLocaleString();
 		doc.save(name);
 	}
 	useEffect(() => {
 		axios.get('http://localhost:3000/api/transaction/readall')
 			.then(res => {
 				var data = [...res.data.data]; axios.get('http://localhost:3000/api/policy/pickpolicy').then(res => {
-					var users_lookup = {}
+					var users_lookup = {};
 
 					res.data.users.map((q) => {
-						users_lookup[q] = q
+						users_lookup[q] = q;
 					});
 					setState({
 						...state, columns: [
@@ -74,9 +74,9 @@ export default function TransactionHistoryTable() {
 							{ title: "Transaction Time", field: "transaction_localetime", editable: 'never' },
 							{ title: "Transaction Amount", field: "transaction_amount", editable: 'onAdd' },
 						], data: [...data]
-					})
-				})
-			})
+					});
+				});
+			});
 
 
 		// 	setState({
@@ -110,11 +110,19 @@ export default function TransactionHistoryTable() {
 								resolve();
 								setState((prevState) => {
 									const data = [...prevState.data];
-									if(newData.transaction_amount < 0)
-										{alert("Transaction Amount cannot be negative!");
-										 return prevState}
+									if (newData.transaction_amount < 0) {
+										alert("Transaction Amount cannot be negative!");
+										return prevState;
+									}
 									newData.id = data.length;
-									axios.post('http://localhost:3000/api/transaction/create', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/transaction/create', newData).then(res => { window.location.reload(true); }).catch(err => {
+										if (err.response) {
+											console.log(err.response.data.message);
+											alert(err.response.data.message);
+										} else {
+											alert('Not connected to Internet');
+										}
+									});
 									return prevState;
 								});
 							}, 600);
@@ -127,9 +135,16 @@ export default function TransactionHistoryTable() {
 									// localStorage.setState('policies',prevState.data)
 									setState((prevState) => {
 										const data = [...prevState.data];
-										
+
 										data[data.indexOf(oldData)] = newData;
-										axios.post('http://localhost:3000/api/transaction/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+										axios.post('http://localhost:3000/api/transaction/update', newData).then(res => { window.location.reload(true); }).catch(err => {
+											if (err.response) {
+												console.log(err.response.data.message);
+												alert(err.response.data.message);
+											} else {
+												alert('Not connected to Internet');
+											}
+										});
 										return { ...prevState, data };
 									});
 								}
@@ -143,7 +158,14 @@ export default function TransactionHistoryTable() {
 									const data = [...prevState.data];
 									data.splice(data.indexOf(oldData), 1);
 									// localStorage.setItem('policies', JSON.stringify(data));
-									axios.post('http://localhost:3000/api/transaction/delete', oldData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/transaction/delete', oldData).then(res => { window.location.reload(true); }).catch(err => {
+										if (err.response) {
+											console.log(err.response.data.message);
+											alert(err.response.data.message);
+										} else {
+											alert('Not connected to Internet');
+										}
+									});
 									return { ...prevState, data };
 								});
 							}, 600);

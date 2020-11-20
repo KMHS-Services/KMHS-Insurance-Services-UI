@@ -86,13 +86,16 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
       }).catch(err => {
         if (err.response) {
           console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
         }
       })
       //.finally(() => setLoading(false))
     // console.log([...users, { username, password, name, email, phoneNo }]);
     // setUsers([...users, { username, password, name, email, phoneNo }]);
     // localStorage.setItem('users',JSON.stringify([...users, { username, password, name, email, phoneNo }]))
-    // 
+    //
     // setSignUpToggle(false);
   }
   return (
@@ -133,7 +136,7 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
                 name="username"
                 autoComplete="lname"
               />
-              
+
             </Grid>
             <Grid item >
             <TextField
@@ -165,8 +168,8 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
                 multiline
               />
             </Grid>
-            
-            
+
+
             <Grid item xs={12}>
               <TextField
                 value={emailid}
@@ -240,8 +243,8 @@ export default function SignUp({ setSignUpToggle, setUsers, users }) {
                   autoComplete="pincode"
                 />
               </Grid>
-              
-            
+
+
           </Grid>
           <Button
             type="submit"

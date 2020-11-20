@@ -25,7 +25,14 @@ export default function AdminTable() {
 		tableLoading: false
 	});
 	useEffect(() => {
-		axios.get('http://localhost:3000/api/admin/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
+		axios.get('http://localhost:3000/api/admin/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => {
+			if (err.response) {
+			  console.log(err.response.data.message);
+			  alert(err.response.data.message)
+			}else{
+			  alert('Not connected to Internet')
+			}
+		  })
 
 	}, []);
 	const validateEmail = function (mail) {
@@ -126,7 +133,14 @@ export default function AdminTable() {
 										return { ...prevState }
 									}
 									newData.id = data.length;
-									axios.post('http://localhost:3000/api/admin/register', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/admin/register', newData).then(res => { window.location.reload(true); }).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
 									return prevState;
 								});
 							}, 600);
@@ -146,7 +160,14 @@ export default function AdminTable() {
 											return { ...prevState }
 										}
 										data[data.indexOf(oldData)] = newData;
-										axios.post('http://localhost:3000/api/admin/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+										axios.post('http://localhost:3000/api/admin/update', newData).then(res => { window.location.reload(true); }).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
 										return { ...prevState, data };
 									});
 								}
@@ -159,7 +180,14 @@ export default function AdminTable() {
 								setState((prevState) => {
 									const data = [...prevState.data];
 									data.splice(data.indexOf(oldData), 1);
-									axios.post('http://localhost:3000/api/admin/delete', { admin_email_id: oldData.admin_email_id }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/admin/delete', { admin_email_id: oldData.admin_email_id }).then(res => { window.location.reload(true); }).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
 									return { ...prevState, data };
 								});
 							}, 600);

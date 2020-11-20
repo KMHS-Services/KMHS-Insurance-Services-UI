@@ -25,7 +25,14 @@ export default function PolicyStats() {
 	useEffect(() => {
 		axios.get('http://localhost:3000/api/stats/policy')
 			.then(res => setState({ ...state, data: res.data.data }))
-			.catch(err => console.log);
+			.catch(err => {
+				if (err.response) {
+				  console.log(err.response.data.message);
+				  alert(err.response.data.message)
+				}else{
+				  alert('Not connected to Internet')
+				}
+			  })
 	}, [])
 	return (
 		<div>

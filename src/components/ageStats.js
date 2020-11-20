@@ -58,9 +58,9 @@ export default function SignInSide() {
 }
   useEffect(() => {
     let ageData = [{label:"<20",y:0},{label:"20-30",y:0},{label:"30-40",y:0}]
-    
+
     axios.get('http://localhost:3000/api/stats/age')
-      .then(res => { 
+      .then(res => {
         res.data.data.map((q) => {
           var today = new Date();
           var dd = today.getDate();
@@ -79,8 +79,8 @@ export default function SignInSide() {
           const date2 = new Date(getDate(q.dob));
           const utc1 = Date.UTC(date1.getFullYear(), date1.getMonth(), date1.getDate());
           const utc2 = Date.UTC(date2.getFullYear(), date2.getMonth(), date2.getDate());
-    
-       
+
+
           const diffTime = Math.floor((utc1 - utc2) / _MS_PER_DAY);
           console.log(diffTime + " years");
           if(diffTime<20)
@@ -106,9 +106,16 @@ export default function SignInSide() {
         setState({ ...state, data: ageData })
         console.log(ageData)
       })
-      .catch(err => console.log);
+      .catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
   }, [])
-  
+
   return (
     <div>
       <CanvasJSChart options={options}

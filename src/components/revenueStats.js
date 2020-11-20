@@ -11,6 +11,7 @@ export default function RevenueStats() {
 		loading: false
 	})
 	const options = {
+		exportEnabled: true,animationEnabled: true,
 		title:{
 			text: "Revenue Statistics"
 		},
@@ -19,7 +20,8 @@ export default function RevenueStats() {
       reversed: true,
     },
     axisY: {
-      title: "Revenue",
+	  title: "Revenue",
+	  includeZero: false
     },
 		data: [
 			{
@@ -31,8 +33,15 @@ export default function RevenueStats() {
 	}
 	useEffect(() => {
 		axios.get('http://localhost:3000/api/stats/financegraph')
-			.then(res => setState({ ...state, data: res.data.data }))
-			.catch(err => console.log);
+			.then(res =>{ console.log(res.data.data);setState({ ...state, data: res.data.data })})
+			.catch(err => {
+				if (err.response) {
+				  console.log(err.response.data.message);
+				  alert(err.response.data.message)
+				}else{
+				  alert('Not connected to Internet')
+				}
+			  })
 	}, [])
 	return (
 		<div>

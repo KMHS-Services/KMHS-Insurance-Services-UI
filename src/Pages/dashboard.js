@@ -73,7 +73,7 @@ function DashBoard(props) {
   const classes = useStyles();
   const theme = useTheme();
   const [mobileOpen, setMobileOpen] = React.useState(false);
-  const [path, setPath] = React.useState(localStorage.getItem('path') || 'Policy')
+  const [path, setPath] = React.useState(localStorage.getItem('isAdmin')==='true'?'Policy':'PickPolicy')
 
   const handleDrawerToggle = () => {
     setMobileOpen(!mobileOpen);
@@ -118,7 +118,7 @@ function DashBoard(props) {
     <div>
       <div className={classes.toolbar} />
       <Divider />
-      
+
       {localStorage.getItem('isAdmin') === "true" ? <List><ListItem >Tables</ListItem><ListItem selected={path === 'Policy'} button key={'Policy'} onClick={() => { setPath('Policy'); localStorage.setItem('path', 'Policy') }}>
         <ListItemIcon><PolicyIcon /></ListItemIcon>
         <ListItemText primary={'Maintain Policy'} />

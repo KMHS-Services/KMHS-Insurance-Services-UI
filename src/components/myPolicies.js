@@ -17,10 +17,17 @@ export default function MyPolicies() {
   React.useEffect(()=>{
     Axios.post('http://localhost:3000/api/user/mypolicy',{username:localStorage.getItem('username')})
     .then(res=>setState({...state,data:res.data.data}))
-    .catch(err=>console.log);
+    .catch(err => {
+      if (err.response) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message)
+      }else{
+        alert('Not connected to Internet')
+      }
+    })
   },[])
 
- 
+
 
 
 
@@ -33,6 +40,6 @@ export default function MyPolicies() {
       data={state.data}
     />
       </div>
-    
+
   );
 }

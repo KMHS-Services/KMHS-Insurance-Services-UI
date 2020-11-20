@@ -25,7 +25,14 @@ export default function PolicyTable() {
     tableLoading:false
   })
   useEffect(()=>{
-    axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err=>console.log);
+    axios.get('http://localhost:3000/api/policy/readall').then(res=>setState({...state,data:res.data.data})).catch(err => {
+      if (err.response) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message)
+      }else{
+        alert('Not connected to Internet')
+      }
+    })
 
   },[])
 
@@ -109,7 +116,14 @@ export default function PolicyTable() {
                   return {...prevState};
                 }
                 newData.id = data.length;
-                axios.post('http://localhost:3000/api/policy/create',newData).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
+                axios.post('http://localhost:3000/api/policy/create',newData).then(res=>{window.location.reload(true)}).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
                 return prevState;
               });
             }, 600);
@@ -145,7 +159,14 @@ export default function PolicyTable() {
                   }
                   data[data.indexOf(oldData)] = newData;
                   // localStorage.setItem('policies', JSON.stringify(data));
-                  axios.post('http://localhost:3000/api/policy/update',newData).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
+                  axios.post('http://localhost:3000/api/policy/update',newData).then(res=>{window.location.reload(true)}).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
                   return { ...prevState, data };
                 });
               }
@@ -161,7 +182,14 @@ export default function PolicyTable() {
                 let policy=oldData.policy
                 console.log(policy);
                 // localStorage.setItem('policies', JSON.stringify(data));
-                axios.post('http://localhost:3000/api/policy/delete',{policy}).then(res=>{window.location.reload(true)}).catch(err=>{alert(err.message)})
+                axios.post('http://localhost:3000/api/policy/delete',{policy}).then(res=>{window.location.reload(true)}).catch(err => {
+        if (err.response) {
+          console.log(err.response.data.message);
+          alert(err.response.data.message)
+        }else{
+          alert('Not connected to Internet')
+        }
+      })
                 return { ...prevState, data };
               });
             }, 600);
@@ -169,6 +197,6 @@ export default function PolicyTable() {
       }}
     />
       </div>
-    
+
   );
 }

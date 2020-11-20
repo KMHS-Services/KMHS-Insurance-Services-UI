@@ -72,20 +72,23 @@ export default function PickPolicy({ setToken, users, setSignUpToggle }) {
     setAdmin(event.target.value);
   };
   const [username, setUsername] = React.useState(localStorage.getItem('username'));
-  
+
   function pickPolicy() {
     axios.post('/api/policyTaken/create',{username,policy,admin_email_id})
     .then((res)=>{
         alert(res.data.message)
-    }).catch(err=>{
-      if(err.response){
-        alert(err.message)
+    }).catch(err => {
+      if (err.response) {
+        console.log(err.response.data.message);
+        alert(err.response.data.message)
+      }else{
+        alert('Not connected to Internet')
       }
     })
   }
 
   return (
-    
+
         <div className={classes.paper}>
           <Typography component="h1" variant="h5">
             Pick Policy
@@ -106,7 +109,7 @@ export default function PickPolicy({ setToken, users, setSignUpToggle }) {
             />
             <br/>
         <br/>
-        
+
         <Select
           displayEmpty
           value={policy}
@@ -150,7 +153,7 @@ export default function PickPolicy({ setToken, users, setSignUpToggle }) {
             return <MenuItem value={q}>{q}</MenuItem>
           })}
         </Select>
-            
+
             <Button
               onClick={pickPolicy}
               fullWidth

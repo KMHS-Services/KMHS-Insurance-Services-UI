@@ -27,7 +27,14 @@ export default function UserTable() {
 		tableLoading: false
 	});
 	useEffect(() => {
-		axios.get('http://localhost:3000/api/user/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => console.log);
+		axios.get('http://localhost:3000/api/user/readall').then(res => setState({ ...state, data: res.data.data })).catch(err => {
+			if (err.response) {
+			  console.log(err.response.data.message);
+			  alert(err.response.data.message)
+			}else{
+			  alert('Not connected to Internet')
+			}
+		  })
 
 	}, []);
 	const validateEmail = function (mail) {
@@ -134,7 +141,14 @@ export default function UserTable() {
 									return { ...prevState }
 								}
 								newData.id = data.length;
-								axios.post('http://localhost:3000/api/user/register', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								axios.post('http://localhost:3000/api/user/register', newData).then(res => { window.location.reload(true); }).catch(err => {
+				if (err.response) {
+				  console.log(err.response.data.message);
+				  alert(err.response.data.message)
+				}else{
+				  alert('Not connected to Internet')
+				}
+			  })
 								return prevState;
 							});
 						}, 600);
@@ -154,7 +168,14 @@ export default function UserTable() {
 										return { ...prevState }
 									}
 									data[data.indexOf(oldData)] = newData;
-									axios.post('http://localhost:3000/api/user/update', newData).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+									axios.post('http://localhost:3000/api/user/update', newData).then(res => { window.location.reload(true); }).catch(err => {
+				if (err.response) {
+				  console.log(err.response.data.message);
+				  alert(err.response.data.message)
+				}else{
+				  alert('Not connected to Internet')
+				}
+			  })
 									return { ...prevState, data };
 								});
 							}
@@ -167,7 +188,14 @@ export default function UserTable() {
 							setState((prevState) => {
 								const data = [...prevState.data];
 								data.splice(data.indexOf(oldData), 1);
-								axios.post('http://localhost:3000/api/user/delete', { username:oldData.username }).then(res => { window.location.reload(true); }).catch(err => { alert(err.message); });
+								axios.post('http://localhost:3000/api/user/delete', { username:oldData.username }).then(res => { window.location.reload(true); }).catch(err => {
+				if (err.response) {
+				  console.log(err.response.data.message);
+				  alert(err.response.data.message)
+				}else{
+				  alert('Not connected to Internet')
+				}
+			  })
 								return { ...prevState, data };
 							});
 						}, 600);
@@ -175,6 +203,6 @@ export default function UserTable() {
 			}}
 		/>
 		</div>
-		
+
 	);
 }
